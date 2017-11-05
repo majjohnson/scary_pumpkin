@@ -1,0 +1,114 @@
+/ include SPI, MP3, Servo and SD libraries
+#include <SPI.h>             // We will use the hardware SPI pins: CLK (13), MISO (12), MOSI (11)
+#include “Adafruit_VS1053.h”
+#include <SD.h>
+int track1, track2, track3;
+const int pingPin = 8;
+const int echoPin = 9;
+unsigned int duration, inches;
+
+// color swirl! connect an RGB LED strip to the PWM pins as indicated
+// in the #defines accroding to http://www.ladyada.net/products/rgbledstrip/
+ 
+
+
+long pulse, cm;
+long old_cm = 0;
+
+//stores the distance of the previous cycle
+long old_b;
+long new_b;
+long z;
+// These are the pins used for the music maker shield
+#define SHIELD_RESET  -1      // VS1053 reset pin (unused!)
+#define SHIELD_CS      7      // VS1053 chip select pin (output)
+#define SHIELD_DCS     6      // VS1053 Data/command select pin (output)
+
+// These are common pins between breakout and shield
+#define CARDCS 4     // Card chip select pin
+// DREQ should be an Int pin, see http://arduino.cc/en/Reference/attachInterrupt
+#define DREQ 3       // VS1053 Data request, ideally an Interrupt pin
+
+long old_inches = 0;
+
+//stores the distance of the previous cycle
+
+
+Adafruit_VS1053_FilePlayer musicPlayer = 
+
+ Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
+
+ void setup() {
+ track1=0;
+ track2=0;
+ track3=0;
+ pinMode(8,OUTPUT);
+ pinMode(9,INPUT);
+ Serial.begin(9600);
+ Serial.println(“File From Distance Test”);
+
+ if (! musicPlayer.begin()) { // initialise the music player
+    Serial.println(F(“Couldn’t find VS1053, do you have the right pins defined?”));
+    while (1);
+ }
+ Serial.println(F(“VS1053 found”));
+ 
+ SD.begin(CARDCS);    // initialise the SD card
+ 
+ // Set volume for left, right channels. lower numbers == louder volume!
+ musicPlayer.setVolume(9,9);
+
+
+ }
+
+void ping()  {
+ digitalWrite(pingPin, LOW);        // Ensure pin is low
+ delayMicroseconds(2);
+ digitalWrite(pingPin, HIGH);       // Start ranging
+ delayMicroseconds(5);              //   with 5 microsecond burst
+ digitalWrite(pingPin, LOW);        // End ranging
+
+ duration = pulseIn(echoPin, HIGH); // Read echo pulse
+ inches = duration / 74 / 2;        // Convert to inches
+ Serial.println(inches);           // Display result
+ if ((inches>5) && (inches<17)) { Serial.println(“1”); delay(500); }
+
+ 
+}
+
+void loop() {
+ delay(50);
+ 
+ ping();
+ 
+ 
+  if ((inches>5) && (inches<17)) {
+   if (track1==0){
+   musicPlayer.playFullFile(“track001.mp3”);
+   track1=1; track2=0; track3=0;}
+  }
+ 
+  
+  if ((inches>8) && (inches<12)) {
+  if (track2==0){
+  musicPlayer.playFullFile(“track002.mp3”);
+   track2=1; track1=0; track3=0;
+   } //track2=0
+  } //inches
+
+  if ((inches>13) && (inches<17)) {
+   if (track3==0){
+
+  musicPlayer.playFullFile(“track003.mp3”);} 
+  track3=1; track2=0; track1=0;}
+
+  
+ 
+  
+
+}
+
+ 
+
+ 
+
