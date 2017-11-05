@@ -1,0 +1,310 @@
+//code based on
+
+// Mark Bilandzic, 2011
+
+//which is  based on
+
+// – http://www.ladyada.net/products/rgbledstrip/ and
+
+// – http://arduino.cc/forum/index.php?topic=64102.0
+
+ 
+
+#define REDPIN 5
+
+#define GREENPIN 6
+
+#define BLUEPIN 3
+
+const int pingPin = 8;
+
+const int echoPin = 9;
+
+ 
+
+long pulse, cm;
+
+long old_cm = 0;
+
+ 
+
+//stores the distance of the previous cycle
+
+long old_b;
+
+long new_b;
+
+long z;
+
+ 
+
+//——————————
+
+void setup() {
+
+ pinMode(REDPIN, OUTPUT);
+
+ pinMode(GREENPIN, OUTPUT);
+
+ pinMode(BLUEPIN, OUTPUT);
+
+ 
+
+ Serial.begin(9600);
+
+ /*pinMode(echoPin, INPUT);*/
+
+ pinMode(8,OUTPUT);
+
+ pinMode(9,INPUT);
+
+ 
+
+}
+
+void loop() {
+
+ ping();
+
+ /*pulse = pulseIn(echoPin, HIGH);
+
+ Serial.print(“Pulse is “);
+
+ Serial.println(pulse);
+
+ cm = pulse/58;   //pulse width is 58uS per cm
+
+ 
+
+ Serial.print(cm);
+
+ Serial.println(“: cm”);*/
+
+ delay(5);
+
+ 
+
+ if (cm < 16) {
+
+   cm = 0;
+
+   Serial.println(” 0″);
+
+ } else if (cm < 20) {
+
+   Serial.println(” 1″);
+
+   cm = 20;
+
+ } else if (cm < 30) {
+
+   Serial.println(” 2″);
+
+   cm = 30;
+
+ } else if (cm < 40) {
+
+   Serial.println(” 3″);
+
+   cm = 40;
+
+ } else if (cm < 50) {
+
+   Serial.println(” 4″);
+
+   cm = 50;
+
+ } else if (cm < 60) {
+
+   Serial.println(” 5″);
+
+   cm = 60;
+
+ } else if (cm < 70) {
+
+   Serial.println(” 6″);
+
+   cm = 70;
+
+ } else if (cm < 80) {
+
+   Serial.println(” 7″);
+
+   cm = 80;
+
+ } else if (cm < 90) {
+
+   Serial.println(” 8″);
+
+   cm = 90;
+
+ } else if (cm < 100) {
+
+   Serial.println(” 9″);
+
+   cm = 100;
+
+ } else if (cm < 110) {
+
+   Serial.println(” 10″);
+
+   cm = 110;
+
+ } else if (cm < 120) {
+
+   Serial.println(” 11″);
+
+   cm = 120;
+
+ } else if (cm < 130) {
+
+   Serial.println(” 12″);
+
+   cm = 130;
+
+ } else if (cm < 140) {
+
+   Serial.println(” 13″);
+
+   cm = 140;
+
+ } else if (cm < 150) {
+
+   Serial.println(” 14″);
+
+   cm = 150;
+
+ } else if (cm < 160) {
+
+   Serial.println(” 15″);
+
+   cm = 160;
+
+ } else if (cm < 170) {
+
+   Serial.println(” 16″);
+
+   cm = 170;
+
+ } else if (cm < 180) {
+
+   Serial.println(” 17″);
+
+   cm = 180;
+
+ } else if (cm < 190) {
+
+   Serial.println(” 18″);
+
+   cm = 190;
+
+ } else {
+
+   Serial.println(” 19″);
+
+   cm = 200;
+
+ }
+
+ 
+
+ 
+
+ 
+
+ new_b = map(cm, 20, 200, 255, 0);
+
+ old_b = map(old_cm, 20, 200, 255, 0);
+
+ 
+
+ 
+
+ if (old_b <= new_b){
+
+   for (z = old_b; z < new_b; z++) {
+
+       analogWrite(REDPIN, z);
+
+       analogWrite(BLUEPIN, z);
+
+       analogWrite(GREENPIN, z);
+
+       delay(2);
+
+   }
+
+  
+
+ }
+
+ else {
+
+   for (z = old_b; z > new_b; z–) {
+
+      analogWrite(REDPIN, z);
+
+      analogWrite(BLUEPIN, z);
+
+      analogWrite(GREENPIN, z);
+
+      delay(2);
+
+      
+
+   }
+
+   
+
+ 
+
+ }
+
+ Serial.print(“Brightness is: “);
+
+ Serial.println(z);
+
+ old_cm = cm;
+
+ 
+
+ 
+
+}
+
+ 
+
+void ping(){
+
+ digitalWrite(pingPin, LOW);        // Ensure pin is low
+
+ delayMicroseconds(2);
+
+ digitalWrite(pingPin, HIGH);       // Start ranging
+
+ delayMicroseconds(5);              //   with 5 microsecond burst
+
+ digitalWrite(pingPin, LOW);
+
+ 
+
+ pulse = pulseIn(echoPin, HIGH);
+
+cm = pulse / 29 / 2;
+
+ Serial.print(“Pulse is “);
+
+ Serial.println(pulse);
+
+ Serial.print(cm);
+
+ Serial.println(“: cm”);
+
+ 
+
+ 
+
+}
+
+ 
+
