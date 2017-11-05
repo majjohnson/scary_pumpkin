@@ -1,0 +1,417 @@
+// include SPI, MP3, Servo and SD libraries
+
+#include <SPI.h>             // We will use the hardware SPI pins: CLK (13), MISO (12), MOSI (11)
+
+#include “Adafruit_VS1053.h”
+
+#include <SD.h>
+
+int track1, track2, track3;
+
+const int pingPin = 8;
+
+const int echoPin = 9;
+
+unsigned int duration, inches;
+
+ 
+
+/*Our Lights*/
+
+#define GREENPIN 6
+
+#define BLUEPIN 3
+
+#define FADESPEED 5     // make this higher to slow down
+
+ 
+
+/*Light test two*/
+
+int led = 6;
+
+int led_two = 3;
+
+int brightness = 0;
+
+int fadeAmount= 5;
+
+ 
+
+// These are the pins used for the music maker shield
+
+#define SHIELD_RESET  -1      // VS1053 reset pin (unused!)
+
+#define SHIELD_CS      7      // VS1053 chip select pin (output)
+
+#define SHIELD_DCS     6      // VS1053 Data/command select pin (output)
+
+// These are common pins between breakout and shield
+
+#define CARDCS 4     // Card chip select pin
+
+// DREQ should be an Int pin, see http://arduino.cc/en/Reference/attachInterrupt
+
+#define DREQ 3       // VS1053 Data request, ideally an Interrupt pin
+
+ 
+
+long old_inches = 0;
+
+ 
+
+//stores the distance of the previous cycle
+
+long old_b;
+
+long new_b;
+
+ 
+
+Adafruit_VS1053_FilePlayer musicPlayer =
+
+ Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
+
+ 
+
+ void setup() {
+
+ /*Our Lights  
+
+ pinMode(GREENPIN, OUTPUT);
+
+ pinMode(BLUEPIN, OUTPUT);
+
+ 
+
+ pinMode(led, OUTPUT);*/
+
+ 
+
+ /*light test two*/
+
+ pinMode(led, OUTPUT);
+
+ pinMode(led_two, OUTPUT);
+
+ 
+
+ 
+
+ track1=0;
+
+ track2=0;
+
+ track3=0;
+
+ pinMode(8,OUTPUT);
+
+ pinMode(9,INPUT);
+
+ Serial.begin(9600);
+
+ Serial.println(“File From Distance Test”);
+
+ 
+
+ if (! musicPlayer.begin()) { // initialise the music player
+
+    Serial.println(F(“Couldn’t find VS1053, do you have the right pins defined?”));
+
+    while (1);
+
+ }
+
+ Serial.println(F(“VS1053 found”));
+
+ 
+
+ SD.begin(CARDCS);    // initialise the SD card
+
+ 
+
+ // Set volume for left, right channels. lower numbers == louder volume!
+
+ musicPlayer.setVolume(0,0);
+
+ }
+
+ 
+
+void ping()  {
+
+ digitalWrite(pingPin, LOW);        // Ensure pin is low
+
+ delayMicroseconds(2);
+
+ digitalWrite(pingPin, HIGH);       // Start ranging
+
+ delayMicroseconds(5);              //   with 5 microsecond burst
+
+ digitalWrite(pingPin, LOW);        // End ranging
+
+ duration = pulseIn(echoPin, HIGH); // Read echo pulse
+
+ inches = duration / 74 / 2;        // Convert to inches
+
+ Serial.println(inches);           // Display result
+
+ if ((inches>5) && (inches<17)) { Serial.println(“1”); delay(500); }
+
+ 
+
+}
+
+void loop() {
+
+ delay(50);
+
+ 
+
+ ping();
+
+ new_lightShow();
+
+ 
+
+  if ((inches>5) && (inches<17)) {
+
+   if (track1==0){
+
+   musicPlayer.playFullFile(“track001.mp3”);
+
+   track1=1; track2=0; track3=0;}
+
+  }
+
+ 
+
+  
+
+  if ((inches>8) && (inches<12)) {
+
+  if (track2==0){
+
+  musicPlayer.playFullFile(“track002.mp3”);
+
+   track2=1; track1=0; track3=0;
+
+   } //track2=0
+
+  } //inches
+
+ 
+
+  if ((inches>13) && (inches<17)) {
+
+   if (track3==0){
+
+ 
+
+  musicPlayer.playFullFile(“track003.mp3”);}
+
+  track3=1; track2=0; track1=0;}
+
+ 
+
+  
+
+ 
+
+  
+
+ 
+
+}
+
+ 
+
+void new_lightShow(){
+
+ if (inches < 16) {
+
+   inches = 0;
+
+   Serial.println(” 0″);
+
+ } else if (inches < 20) {
+
+   Serial.println(” 1″);
+
+  inches = 20;
+
+ } else if (inches < 12) {
+
+   Serial.println(” 2″);
+
+   inches = 12;
+
+ } else if (inches < 14) {
+
+   Serial.println(” 3″);
+
+   inches = 14;
+
+ } else if (inches < 18) {
+
+   Serial.println(” 4″);
+
+   inches = 18;
+
+ } else if (inches < 22) {
+
+   Serial.println(” 5″);
+
+   inches = 22;
+
+ } else if (inches < 26) {
+
+   Serial.println(” 6″);
+
+   inches = 26;
+
+ } else if (inches < 30) {
+
+   Serial.println(” 7″);
+
+   inches = 30;
+
+ } else if (inches < 34) {
+
+   Serial.println(” 8″);
+
+   inches = 34;
+
+ } else if (inches < 38) {
+
+   Serial.println(” 9″);
+
+   inches = 38;
+
+ } else if (inches < 42) {
+
+   Serial.println(” 10″);
+
+   inches = 42;
+
+ } else if (inches < 46) {
+
+   Serial.println(” 11″);
+
+   inches = 46;
+
+ } else if (inches < 50) {
+
+   Serial.println(” 12″);
+
+   inches = 50;
+
+ } else if (inches < 54) {
+
+   Serial.println(” 13″);
+
+   inches = 54;
+
+ } else if (inches < 58) {
+
+   Serial.println(” 14″);
+
+   inches = 58;
+
+ } else if (inches < 62) {
+
+   Serial.println(” 15″);
+
+   inches = 62;
+
+ } else if (inches < 66) {
+
+   Serial.println(” 16″);
+
+   inches = 66;
+
+ } else if (inches < 70) {
+
+   Serial.println(” 17″);
+
+   inches = 70;
+
+ } else if (inches < 74) {
+
+   Serial.println(” 18″);
+
+   inches = 74;
+
+ } else {
+
+   Serial.println(” 19″);
+
+   inches= 79;
+
+ }
+
+ 
+
+ 
+
+ 
+
+ new_b = map(inches, 20, 200, 255, 0);
+
+ old_b = map(old_inches, 20, 200, 255, 0);
+
+//  Serial.print(new_b);
+
+//  Serial.println(“: brightness”);
+
+//  Serial.print(cm);
+
+//  Serial.println(“: cm”);
+
+ 
+
+ 
+
+ if (old_b <= new_b){
+
+   for (long z = old_b; z < new_b; z++) {
+
+       
+
+       analogWrite(BLUEPIN, z);
+
+       analogWrite(GREENPIN, z);
+
+       delay(2);
+
+   }
+
+ }
+
+ else {
+
+   for (long z = old_b; z > new_b; z–) {
+
+     
+
+      analogWrite(BLUEPIN, z);
+
+      analogWrite(GREENPIN, z);
+
+      delay(2);
+
+   }
+
+ 
+
+ }
+
+ 
+
+ old_inches = inches;
+
+ 
+
+ 
+
+}
